@@ -6,6 +6,16 @@
     <resultMap type="com.example.entity.Course" id="courseMap">
         <id column="ID" property="id"/>
         <result column="NAME" property="name"/>
+        
+        <association property="courseDetail" javaType="com.example.entity.CourseDetail">
+        	<id column="CD_ID" property="id"/>
+        	<result column="DESCRIPTION" property="description"/>
+        </association>
+        
+        <collection property="chapters" ofType="com.example.entity.Chapter">
+        	<id column="CH_ID" property="id"/>
+        	<result column="CH_NAME" property="name"/>
+        </collection>
     </resultMap>
 
     <select id="findAll" resultMap="courseMap">
@@ -21,7 +31,25 @@
     </select>
     
     <select id="findById" resultMap="courseMap">
-    	SELECT * FROM COURSES WHERE ID = #{id}
+    	SELECT
+    		C.ID,
+    		C.NAME,
+    		CD.ID AS CD_ID,
+    		CD.DESCRIPTION,
+    		CH.ID AS CH_ID,
+    		CH.NAME AS CH_NAME
+    	FROM
+    		COURSES C
+    	INNER JOIN
+    		COURSE_DETAILS CD
+    	ON
+    		C.ID = CD.COURSES_ID
+    	INNER JOIN
+    		CHAPTERS CH
+    	ON
+    		C.ID = CH.COURSES_ID
+    	WHERE
+    		C.ID = #{id}
     </select>
     
     <insert id="insert" useGeneratedKeys="true" keyColumn="ID" keyProperty="id">
